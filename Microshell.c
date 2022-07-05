@@ -16,12 +16,10 @@ int help(){
     printf(" exit - zakonczenie dzialania programu powloki \n");
     printf(" help - wyswietlanie autora projektu i oferowanych przez niego uslug \n");
     printf(" touch - tworzenie nowego pliku 'touch nazwa_pliku' \n");
-    printf(" Wypisanie komunikatu bledu, przy niepoprawnym wpisaniu polecenia. \n");
-    
+    printf(" Wypisanie komunikatu bledu, przy niepoprawnym wpisaniu polecenia. \n");  
 }
 
 void path(){
-	
     wd[max-1] = '\0';
     if(getcwd(wd, max-1) != NULL){
         printf("[{%s}]$ ", wd);
@@ -72,7 +70,6 @@ int main()
         fgets(napis, max, stdin);
         kom=strtok(napis," \n");
         par=strtok(NULL," \n");
-	
         if (strcmp(napis,"exit")==0) exit(0);
         else if (strcmp(napis,"help")==0) help();
         else if (strcmp(napis,"ls")==0) ls(par);
@@ -80,6 +77,5 @@ int main()
   	else if (strcmp(napis,"touch")==0) touch(par);
   	else printf("Nieprawidlowe polecenie\n"); 
     };
-
     return 0;
 }
