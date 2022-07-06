@@ -1,0 +1,107 @@
+import unittest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# Dane tesowe
+name_1 = "Krzysztof"
+surname = "Testowy"
+account_Name = "testowyuzytkownik@wp.pl"
+password ="Test01."
+Phone_number = "111222333"
+Company_Name = "Testowanie"
+Street_1 = "Wolczynskiego"
+Street_number = "6"
+Post_code_1 = "51-630"
+City_1 = "Poznan"
+Nip_1 = "423423423"
+
+class AutomationRegistration(unittest.TestCase):
+    def setUp(self):
+        # Przygotowanie testu
+        self.driver = webdriver.Chrome()
+        self.driver.get("")
+
+    def testRegister(self):
+        driver = self.driver
+        # Kliknij przycisk Rejestracja
+        register_button = driver.find_element(By.CLASS_NAME, "login__link--secondary")
+        register_button.click()
+        # Wpisz Login do pola Login
+        Insert_login = driver.find_element(By.ID, "b2b-email")
+        Insert_login.send_keys(account_Name)
+        # Wpisz nazwisko do pola Nazwisko
+        Insert_Surname = driver.find_element(By.ID, "b2b-last-name")
+        Insert_Surname.send_keys(surname)
+        # Wpisz numer telefonu do pola Nr telefonu
+        Insert_Phone = driver.find_element(By.ID, "b2b-phone")
+        Insert_Phone.send_keys(Phone_number)
+        # Wpisz nazwę firmy do pola Pełna nazwa firmy
+        Insert_Company = driver.find_element(By.ID, "b2b-company-name")
+        Insert_Company.send_keys(Company_Name)
+        # Wpisz ulice do pola Ulica
+        Insert_Street = driver.find_element(By.ID, "b2b-street")
+        Insert_Street.send_keys(Street_1)
+        # Wpisz numer ulicy do pola Numer
+        Insert_Street_number = driver.find_element(By.XPATH, "/html/body/div[2]/main/div[3]/div/section/form/fieldset[2]/div/div[2]/div[2]/div/input")
+        Insert_Street_number.send_keys(Street_number)
+        # Wpisz kod pocztowy do pola Kod pocztowy
+        Insert_Post_Code = driver.find_element(By.ID, "b2b-zip-code")
+        Insert_Post_Code.send_keys(Post_code_1)
+        # Wpisz miejscowosc do pola Miejscowość
+        Insert_City = driver.find_element(By.ID, "b2b-city")
+        Insert_City.send_keys(City_1)
+        # Wpisz NIP do pola NIP
+        Insert_Nip = driver.find_element(By.ID, "b2b-vat-number")
+        Insert_Nip.send_keys(Nip_1)
+        # Zaznacz checkoboxa "Oświadczam, że zapoznałem się z Regulaminem oraz Polityką Prywatności i akceptuję ich warunki"
+        Insert_checkbox = driver.find_element(By.CLASS_NAME, "modal-trigger")
+        Insert_checkbox.click()
+        # Odczekaj 2 sekundy aż wyświetli się regulamin
+        time.sleep(2)
+        # Spawdź czy pole "AKCEPTUJĘ REGULAMIN" wyświetliło się na stronie, jeśli nie to poczekaj 10 sekund to tego czasu, jak wyświeliło się to kliknij w przycisk
+        try:
+            Accept_Checkobox  = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/div[2]/main/div[3]/div/div[1]/div/section/div/button[3]"))
+            )
+            Accept_Checkobox .click()
+        except:
+            print("")
+        # Kliknij przycisk "PRZEŚLIJ DANE" w celu zarejestrowania się do portalu
+        Register_button = driver.find_element(By.XPATH, "/html/body/div[2]/main/div[3]/div/section/form/button[2]")
+        Register_button.click()
+        # Ustalam 3 zmienne, które będę wykorzystywać do znalezienia i sprawdzenia błędów
+        i=0
+        x=0
+        tab = []
+        #Wyszukuje sekcję na której znajduje się formularz
+        error_all = driver.find_element(By.XPATH, "/html/body/div[2]/main/div[3]/div/section")
+        #Wyszukuje wszyskie elementy które są divem w formularzu
+        errors_search = error_all.find_elements(By.TAG_NAME, "div")
+        #Tworzę pętle, która wypisuje wszystkie komunikaty w formularzu
+        for error in errors_search:
+            #Każdy komunikat dopisuję do tablicy
+            tab.append(error.text)        
+            #Każdy błąd ma komunikat "To jest wymagane pole", więc jeśli bląd wystąpi to używam instrukcji warunkowej if 
+            if(error.text == "To jest wymagane pole."):
+                # Zmienna i zlicza ilość wystąpienia błędów na stronie
+                i=i+1
+                # Przypisuje zmiennej s wartość komunikatu o błędzie, z racji, że komunikat ma formę (nazwa pola + komunikat o błędzie), to rozdzielam 
+                # całość, na dwie tablicę. Używam poprzedniego elementu tablicy, gdyż komunikat o błędzie jest aktualnym elementem tablicy t[x], a poprzedni element,
+                # to miejsce w którym wystąpił błąd.
+                s=tab[x-1].split("\n")
+                # Jeśli błąd pojawił się w innym miejscu niż przy wpisaniu imienia, to funckja zwraca nam błąd
+                self.assertEqual("IMIĘ", s[0], "Error message is not correct")
+            x=x+1  
+        # Jeśli istnieje więcej niż jedno miejsce w którym występuje błąd to funkcja zwraca błąd i podaje ile błędów występuje w formularzu
+        self.assertEqual(1,  i,"\nThere are more errors than 1 \nNumbers of errors: " + str(i))
+        # Zamknięcie testu
+        def tearDown(self):
+            self.driver.close()
+       
+       
+if __name__ == "__main__":
+    #Inicjuje wszystkie unitesty
+    unittest.main()
