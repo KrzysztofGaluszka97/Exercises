@@ -58,8 +58,7 @@ void touch(char * par) {
     FILE * plik = fopen(par, "a");
     fclose(plik);
 }
-int main()
-{
+int main() {
     char napis[max];
     char * kom;
     char * par;
